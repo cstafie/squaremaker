@@ -1,0 +1,24 @@
+{
+  "name": "squaremaker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cstafie/squaremaker.git"
+  },
+  "author": "cstafie",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cstafie/squaremaker/issues"
+  },
+  "homepage": "https://github.com/cstafie/squaremaker#readme",
+  "dependencies": {
+    "svg.js": "^2.7.1",
+    "svgdom": "0.0.15"
+  }
+}
