@@ -6,7 +6,6 @@ const {
 } = require('./config');
 
 const drawLine = (svg, {x1, y1, x2, y2}) => {
-	console.log(x1,y1,x2,y2);
 	svg.line(x1 * size, y1 * size, x2 * size, y2 * size)
 		.stroke({ color: '#000', width: 2 })
 }
@@ -18,12 +17,9 @@ const drawContour = (svg, width, height) => {
 	drawLine(svg, { x1: 0, y1: height, x2: width, y2: height });
 }
 
-const createFile = async (name, string) => {
+const createFile = async (name, string, cb) => {
 	const fileName = `${__dirname}/squares/square${name}.svg`;
-	fs.writeFile(fileName, string, (err) => {
-		if (err) console.log(err);
-		else console.log(`success: #${fileName}`);
-	});
+	fs.writeFile(fileName, string, cb);
 }
 
 const defineInnerEdges = (width, height) => { 
@@ -54,6 +50,7 @@ const defineInnerEdges = (width, height) => {
 }
 
 const makeSVGInstance = () => {
+	// TODO: figure out how not to write the next line
 	const window = _cloneDeep(require('svgdom'));
 	const SVG = require('svg.js')(window);
 	const document = window.document;

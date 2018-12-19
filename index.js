@@ -14,32 +14,41 @@ const {
 	height
 } = require('./config');
 
-
-const numInnerEdges = (width - 1) * height + (height - 1) * width; // OR 2 * width * height - width - height
+// numInnerEdges = (width - 1) * height + (height - 1) * width = 2 * width * height - width - height
 // Runtime is O( (2 ^ numInnerEdges) * numInnerEdges))
+
+console.log('defining inner edges');
 const innerEdges = defineInnerEdges(width, height);
-const combinations = Math.pow(2, numInnerEdges);
+const combinations = Math.pow(2, innerEdges.length);
+console.log(`There are ${innerEdges.length} inner edges and ${combinations} combinations`);
 
-console.log(numInnerEdges, innerEdges.length);
-
-
+const svgBar = new progressBar('creating svgs [:bar] :percent :elapsed', { total: combinations, width: 30 });
 const svgs = new Array(combinations).fill().map((v,i) => {
-	i % 100 ? null : console.log(i);
+	svgBar.tick();
 	return makeSVGInstance();
 });
 
+const total = innerEdges.length * svgs.length;
+const innerEdgeBar = new progressBar('drawing edges [:bar] :percent :elapsed', { total, width: 30 });
 innerEdges.forEach((edge, edgeIndex) => {
 	const parity = combinations / Math.pow(2, edgeIndex + 1);
 	svgs.forEach((svg, svgIndex) => {
 		if (svgIndex & parity) {
 			drawLine(svg, edge);
 		}
+		innerEdgeBar.tick();
 	});
 });
 
+const fileBar = new progressBar('creating files [:bar] :percent :elapsed', { total: svgs.length, width: 30});
 svgs.forEach((svg, index) => {
 	drawContour(svg, width, height);
-	createFile(index, svg.svg());
+	createFile(index, svg.svg(), (err) => {
+		if (err) {
+			console.err(err);
+		}
+		fileBar.tick();
+	});
 });
 
 
