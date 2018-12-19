@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "rm squares/*; node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/cstafie/squaremaker#readme",
   "dependencies": {
+    "lodash": "^4.17.11",
+    "progress": "^2.0.3",
     "svg.js": "^2.7.1",
     "svgdom": "0.0.15"
   }
