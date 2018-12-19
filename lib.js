@@ -1,25 +1,21 @@
 const fs = require('fs');
-const _cloneDeep = require('lodash/cloneDeep');
 
 const {
 	size
 } = require('./config');
 
-const drawLine = (svg, {x1, y1, x2, y2}) => {
-	svg.line(x1 * size, y1 * size, x2 * size, y2 * size)
-		.stroke({ color: '#000', width: 2 })
-}
-
-const drawContour = (svg, width, height) => {
-	drawLine(svg, { x1: 0, y1: 0, x2: width, y2: 0 });
-	drawLine(svg, { x1: 0, y1: 0, x2: 0, y2: height });
-	drawLine(svg, { x1: width, y1: 0, x2: width, y2: height });
-	drawLine(svg, { x1: 0, y1: height, x2: width, y2: height });
-}
 
 const createFile = async (name, string, cb) => {
-	const fileName = `${__dirname}/squares/square${name}.svg`;
-	fs.writeFile(fileName, string, cb);
+	return new Promise( (resolve, reject) => {
+		const fileName = `${__dirname}/squares/square${name}.svg`;
+		fs.writeFile(fileName, string, (err) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve(fileName);
+			}
+		});
+	});
 }
 
 const defineInnerEdges = (width, height) => { 
@@ -49,19 +45,32 @@ const defineInnerEdges = (width, height) => {
 	return temp;
 }
 
-const makeSVGInstance = () => {
-	// TODO: figure out how not to write the next line
-	const window = _cloneDeep(require('svgdom'));
-	const SVG = require('svg.js')(window);
-	const document = window.document;
-	return SVG(document.documentElement);
+const svgOpen = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs">';
+const svgClose = '</svg>';
+
+function SVG() {
+	this.content = [svgOpen];
 }
 
+SVG.prototype.drawLine = function({x1, y1, x2, y2}) {
+
+	this.content.push(`<line id="SvgjsLine${this.content.length}}" x1="${x1*size}" y1="${y1*size}" x2="${x2*size}" y2="${y2*size}" stroke="#000000" stroke-width="2"/>`);
+}
+
+SVG.prototype.drawContour = function(width, height) {
+	this.drawLine({ x1: 0, y1: 0, x2: width, y2: 0 });
+	this.drawLine({ x1: 0, y1: 0, x2: 0, y2: height });
+	this.drawLine({ x1: width, y1: 0, x2: width, y2: height });
+	this.drawLine({ x1: 0, y1: height, x2: width, y2: height });
+}
+
+SVG.prototype.toString = function() {
+	this.content.push(svgClose);
+	return this.content.join('');
+}
 
 module.exports = {
 	defineInnerEdges,
 	createFile,
-	makeSVGInstance,
-	drawLine,
-	drawContour,
+	SVG,
 }
